@@ -98,16 +98,32 @@ reg [3:0]g;
 reg [3:0]b;
 always @*
     begin
-	    if((pixel_x>=96)&&(pixel_x<=111)&&(pixel_y>=64)&&(pixel_y<=95)) //si ven entre los x hay 16 bits y entre los y hay 32 bits
+	if((pixel_x>=96)&&(pixel_x<=111)&&(pixel_y>=64)&&(pixel_y<=95)) //si ven entre los x hay 16 bits y entre los y hay 32 bits
             begin
-                char<=2'h1;
+                char<=2'h1; //f
             end
         else if ((pixel_x>=128)&&(pixel_x<=143)&&(pixel_y>=64)&&(pixel_y<=95))
             begin
-                char<=2'h2;
-            end
+                char<=2'h2;//h
+	    end
+	    else if ((pixel_x>=64)&&(pixel_x<=79)&&(pixel_y>=224)&&(pixel_y<=255))
+            begin
+                char<=2'h2;//h
+	    end
+	else if ((pixel_x>=96)&&(pixel_x<=111)&&(pixel_y>=224)&&(pixel_y<=255))
+            begin
+		char<= //codigo de r 
+	    end
+	else if ((pixel_x>=96)&&(pixel_x<=111)&&(pixel_y>=384)&&(pixel_y<=415))
+            begin
+		char<= //codigo de t 
+	    end
+	else if ((pixel_x>=128)&&(pixel_x<=143)&&(pixel_y>=384)&&(pixel_y<=415))
+	    begin
+            	char<= //codigo para la i
+	    end
         else 
-            char<=2'h0;
+            char<=2'h0; // fondo
     end
 
 always @*
@@ -137,7 +153,7 @@ always @*
                         g<=4'h1;
                         b<=4'h0;  
                     end
-            else if(cajitat)
+           else if(cajitat|fontb==1)
                     begin
                         r<=4'h1;
                         g<=4'h0;
