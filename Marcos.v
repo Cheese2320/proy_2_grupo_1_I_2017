@@ -86,7 +86,7 @@ wire fontb;
 fontROM rom1(.clk(clk),
              .addr(rom),
              .data(word));
-wire fok,hok,h1ok,rok,tok,iok, varaok;
+//wire fok,hok,h1ok,rok,tok,iok, varaok; al final no las use
 assign row = pixel_y[4:1];
 assign rom = {char,row};
 assign bit = pixel_x[3:1];
@@ -98,7 +98,7 @@ reg [3:0]g;
 reg [3:0]b;
 always @*
     begin
-        if((pixel_x>=96)&&(pixel_x<=111)&&(pixel_y>=64)&&(pixel_y<=95))
+	    if((pixel_x>=96)&&(pixel_x<=111)&&(pixel_y>=64)&&(pixel_y<=95)) //si ven entre los x hay 16 bits y entre los y hay 32 bits
             begin
                 char<=2'h1;
             end
@@ -150,10 +150,11 @@ always @*
                     b<=4'h1;
                 end
         end
-
+//salidas finales del rgb en este modulo
  assign ro=r;
  assign go=g;
  assign bo=b;
+//son solo para ver en la simulacion, no se utilizan en si al final
  assign char1=char;
  assign font1=word;
  assign fb=fontb;
