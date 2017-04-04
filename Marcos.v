@@ -147,7 +147,7 @@ always @*
                        g<=4'h0;
                        b<=4'h1;  
                     end
-            else if(cajitah)
+	   else if(cajitah|fontb==1)
                     begin
                         r<=4'h0;
                         g<=4'h1;
