@@ -69,83 +69,47 @@ wire fhv1,fhv2, fhh1, fhh2, cajitafh, hv1, hv2, hh1, hh2, cajitah, tv1, tv2, th1
     assign cajitah = (hv1|hv2|hh1|hh2);
     
     //Cajita para timer
-    assign tv1 = ((pixel_x>=160)&&(pixel_x<=175)&&(pixel_y>=336)&&(pixel_y<=431));
-    assign tv2 = ((pixel_x>=448)&&(pixel_x<=463)&&(pixel_y>=336)&&(pixel_y<=431));
-    assign th1 = ((pixel_x>=160)&&(pixel_x<=463)&&(pixel_y>=336)&&(pixel_y<=351));
-    assign th2 = ((pixel_x>=160)&&(pixel_x<=463)&&(pixel_y>=416)&&(pixel_y<=431));
+    assign tv1 = ((pixel_x>=160)&&(pixel_x<=175)&&(pixel_y>=352)&&(pixel_y<=447));
+    assign tv2 = ((pixel_x>=448)&&(pixel_x<=463)&&(pixel_y>=352)&&(pixel_y<=447));
+    assign th1 = ((pixel_x>=160)&&(pixel_x<=463)&&(pixel_y>=352)&&(pixel_y<=367));
+    assign th2 = ((pixel_x>=160)&&(pixel_x<=463)&&(pixel_y>=432)&&(pixel_y<=447));
     assign cajitat = (tv1|tv2|th1|th2);
 
 //letras
 reg [1:0] char;
 wire [3:0] row;
 wire [5:0] rom;
-reg [2:0] selec;
 wire [2:0] bit;
-wire [7:0] font;
+wire [7:0] word;
 wire fontb;
 
 fontROM rom1(.clk(clk),
              .addr(rom),
-             .sel_caracter(selec),
-             .data(font));
+             .data(word));
 wire fok,hok,h1ok,rok,tok,iok, varaok;
-assign row = pixel_y[3:0];
-assign bit = pixel_x[2:0];
+assign row = pixel_y[4:1];
 assign rom = {char,row};
-assign fontb=font[~bit];
-assign fok=((pixel_x>=96)&&(pixel_x<=111)&&(pixel_y>=48)&&(pixel_y<=79));
-assign hok=((pixel_x>=128)&&(pixel_x<=143)&&(pixel_y>=48)&&(pixel_y<=79));
-assign font1=font;
-assign fb=fontb;
-
-	
+assign bit = pixel_x[3:1];
+assign fontb = word[~bit];
+    	
 // ***************Multiplexor de bordes*****************
 reg [3:0]r;
 reg [3:0]g;
 reg [3:0]b;
-/*always @*
-begin
-    if(fok)
+always @*
     begin
-    selec<=1'b0;
-    char<=2'b01;
-            if(fontb==1)
+        if((pixel_x>=96)&&(pixel_x<=111)&&(pixel_y>=64)&&(pixel_y<=95))
             begin
-                r<=4'h0;
-                g<=4'h0;
-                b<=4'h1;
+                char<=2'h1;
             end
-            else
+        else if ((pixel_x>=128)&&(pixel_x<=143)&&(pixel_y>=64)&&(pixel_y<=95))
             begin
-                r<=4'h0;
-                g<=4'h0;
-                b<=4'h1;
+                char<=2'h2;
             end
-      end
-    else if(hok) 
-    begin
-    selec<=1'b1;
-    char<=2'b10;
-        if(fontb==1)
-        begin
-            r<=4'h0;
-            g<=4'h0;
-            b<=4'h1;
-        end
-        else
-        begin
-            r<=4'h0;
-            g<=4'h0;
-            b<=4'h1;
-        end
+        else 
+            char<=2'h0;
     end
-    else
-    begin
-        r<=4'h1;
-        g<=4'h1;
-        b<=4'h1;
-    end
-end*/
+
 always @*
     if(rst|~video_on)
         begin
@@ -161,7 +125,7 @@ always @*
                     g<=4'h0;
                     b<=4'h3;
                 end
-            else if(cajitafh)
+            else if(cajitafh|fontb==1)
                     begin
                        r<=4'h0;
                        g<=4'h0;
@@ -191,6 +155,8 @@ always @*
  assign go=g;
  assign bo=b;
  assign char1=char;
+ assign font1=word;
+ assign fb=fontb;
 endmodule
 
 
