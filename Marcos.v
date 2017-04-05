@@ -1,10 +1,30 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 30.03.2017 17:10:01
+// Design Name: 
+// Module Name: vgastatic_tb
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
 module Marcos(
  	input wire rst, //reset
  	input wire video_on, // indica donde pintar
  	input wire [9:0] pixel_x, pixel_y, // posicion coordenadas x, y
- 	output [3:0] ro,go,bo,
- 	output [7:0] font1,
- 	output [2:0] char1,
+ 	output wire [3:0] ro,go,bo,
+ 	output wire [7:0]font1,
+ 	output [4:0] char1,
  	output fb
 );
 
@@ -74,21 +94,30 @@ wire fhv1,fhv2, fhh1, fhh2, cajitafh, hv1, hv2, hh1, hh2, cajitah, tv1, tv2, th1
     assign th1 = ((pixel_x>=160)&&(pixel_x<=463)&&(pixel_y>=352)&&(pixel_y<=367));
     assign th2 = ((pixel_x>=160)&&(pixel_x<=463)&&(pixel_y>=432)&&(pixel_y<=447));
     assign cajitat = (tv1|tv2|th1|th2);
+    
+    // letras y simbolos
+wire dok,tok,hok,rok,tiok,iok, puntosfh, puntost;
+    assign dok= ((pixel_x>=96)&&(pixel_x<=111)&&(pixel_y>=64)&&(pixel_y<=95));
+    assign tok= ((pixel_x>=128)&&(pixel_x<=143)&&(pixel_y>=64)&&(pixel_y<=95));
+    assign hok= ((pixel_x>=64)&&(pixel_x<=79)&&(pixel_y>=224)&&(pixel_y<=255));
+    assign rok= ((pixel_x>=96)&&(pixel_x<=111)&&(pixel_y>=224)&&(pixel_y<=255));
+    assign tiok= ((pixel_x>=96)&&(pixel_x<=111)&&(pixel_y>=384)&&(pixel_y<=415));
+    assign iok= ((pixel_x>=128)&&(pixel_x<=143)&&(pixel_y>=384)&&(pixel_y<=415));
+    assign puntosfh= ((((pixel_x>=256)&&(pixel_x<=271))|((pixel_x>=352)&&(pixel_x<=367)))&&((pixel_y>=64)&&(pixel_y<=95)));
+    assign puntost= ((((pixel_x>=256)&&(pixel_x<=271))|((pixel_x>=352)&&(pixel_x<=367)))&&((pixel_y>=384)&&(pixel_y<=415)));
+    
 
 //letras
-reg [1:0] char;
+reg [4:0]char2;
 wire [3:0] row;
-wire [5:0] rom;
+wire [8:0] rom;
 wire [2:0] bit;
 wire [7:0] word;
 wire fontb;
 
-fontROM rom1(.clk(clk),
-             .addr(rom),
-             .data(word));
-//wire fok,hok,h1ok,rok,tok,iok, varaok; al final no las use
+fontROM rom1(.addr(rom), .data(word));
 assign row = pixel_y[4:1];
-assign rom = {char,row};
+assign rom = {char2,row};
 assign bit = pixel_x[3:1];
 assign fontb = word[~bit];
     	
@@ -98,32 +127,40 @@ reg [3:0]g;
 reg [3:0]b;
 always @*
     begin
-	if((pixel_x>=96)&&(pixel_x<=111)&&(pixel_y>=64)&&(pixel_y<=95)) //si ven entre los x hay 16 bits y entre los y hay 32 bits
+	   if(dok) //si ven entre los x hay 16 bits y entre los y hay 32 bits
             begin
-                char<=2'h1; //f
+                char2<=5'b00010; //D
             end
-        else if ((pixel_x>=128)&&(pixel_x<=143)&&(pixel_y>=64)&&(pixel_y<=95))
+       else if (tok)
             begin
-                char<=2'h2;//h
-	    end
-	    else if ((pixel_x>=64)&&(pixel_x<=79)&&(pixel_y>=224)&&(pixel_y<=255))
+                char2<=5'b01110;//T
+	        end
+	   else if (hok)
             begin
-                char<=2'h2;//h
-	    end
-	else if ((pixel_x>=96)&&(pixel_x<=111)&&(pixel_y>=224)&&(pixel_y<=255))
+                char2<=5'b00101;//H
+	        end
+	   else if (rok)
             begin
-		char<= //codigo de r 
-	    end
-	else if ((pixel_x>=96)&&(pixel_x<=111)&&(pixel_y>=384)&&(pixel_y<=415))
+		        char2<= 5'b01100;//codigo de R 
+	        end
+	   else if (tiok)
             begin
-		char<= //codigo de t 
-	    end
-	else if ((pixel_x>=128)&&(pixel_x<=143)&&(pixel_y>=384)&&(pixel_y<=415))
-	    begin
-            	char<= //codigo para la i
-	    end
+		        char2<= 5'b01110;//codigo de t 
+	        end
+	   else if (iok)
+	        begin
+            	char2<= 5'b00110;//codigo para la i
+	        end
+	   else if (puntosfh)
+	        begin
+	           char2<=5'b11010;//Puntos de separación para los numeros de las horas, minutos y segundos, tanto para el reloj como para el timer
+	        end
+	   else if(puntost)
+	        begin
+	           char2<=5'b11010;
+	        end
         else 
-            char<=2'h0; // fondo
+        char2<=5'b00000; // fondo
     end
 
 always @*
@@ -137,29 +174,29 @@ always @*
         begin
             if(BordeIzq_on|BordeDer_on|BordeSup_on|BordeInf_on)
                 begin
-                    r<=4'h5;
+                    r<=4'h6;
                     g<=4'h0;
-                    b<=4'h3;
+                    b<=4'h4;
                 end
-            else if(cajitafh|fontb==1)
-                    begin
-                       r<=4'h0;
-                       g<=4'h0;
-                       b<=4'h1;  
-                    end
-	   else if(cajitah|fontb==1)
-                    begin
-                        r<=4'h0;
-                        g<=4'h1;
-                        b<=4'h0;  
-                    end
-           else if(cajitat|fontb==1)
-                    begin
-                        r<=4'h1;
-                        g<=4'h0;
-                        b<=4'h0;  
-                    end
-            else
+           else if(cajitafh|(fontb==1&&(dok|tok|puntosfh)))
+                begin
+                    r<=4'h0;
+                    g<=4'h0;
+                    b<=4'h1;  
+                end
+	       else if(cajitah|(fontb==1 && (hok|rok)))
+                begin
+                    r<=4'h0;
+                    g<=4'h1;
+                    b<=4'h0;  
+                end
+           else if(cajitat|(fontb==1 && (tiok|iok|puntost)))
+                begin
+                    r<=4'h1;
+                    g<=4'h0;
+                    b<=4'h0;  
+                end
+           else
                 begin
                     r<=4'h1;
                     g<=4'h1;
@@ -171,7 +208,7 @@ always @*
  assign go=g;
  assign bo=b;
 //son solo para ver en la simulacion, no se utilizan en si al final
- assign char1=char;
+ assign char1=char2;
  assign font1=word;
  assign fb=fontb;
 endmodule
