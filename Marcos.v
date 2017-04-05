@@ -153,7 +153,7 @@ always @*
 	        end
 	   else if (puntosfh)
 	        begin
-	           char2<=5'b11010;//Puntos de separación para los numeros de las horas, minutos y segundos, tanto para el reloj como para el timer
+	           char2<=5'b11100;//Guiones de separación para los numeros de las horas, minutos y segundos, tanto para el reloj como para el timer
 	        end
 	   else if(puntost)
 	        begin
