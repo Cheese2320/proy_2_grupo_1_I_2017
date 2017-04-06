@@ -36,7 +36,7 @@ always@* begin
                   address_out = 5'h11; //Deco para 1
                   end
              4'b0010: begin
-			            address_out = 5'h12; //Deco para 2
+	          address_out = 5'h12; //Deco para 2
                   end
              4'b0011: begin
                   address_out = 5'h13; //Deco para 3
