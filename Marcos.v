@@ -73,6 +73,58 @@ wire fhv1,fhv2, fhh1, fhh2, cajitafh, hv1, hv2, hh1, hh2, cajitah, tv1, tv2, th1
 	wire  BordeInf_on;
 	assign BordeInf_on = ((pixel_x>=BordeInfIzqx) && (pixel_x<=BordeInfDerx) &&
 	(pixel_y>=BordeInfy) && (pixel_y<=BordeInfyf));
+
+// ******************************************************	  	
+	
+// ********** BOTONES INSTRUCCION ***********************	
+    
+        // BOTON IZQUIERDA
+        localparam BordeBIIzx=526;
+        localparam BordeBIDerx=541;
+        localparam BordeBIy = 67;
+        localparam BordeBIyf = 82;
+        wire BordeBI_on;
+        assign BordeBI_on = (BordeBIIzx<=pixel_x) && (pixel_x<=BordeBIDerx) &&
+        (BordeBIy<=pixel_y) && (pixel_y<=BordeBIyf);
+    
+        // BOTON DERECHA
+        localparam BordeBDIzqx=556;
+        localparam BordeBDDerx=571;
+        localparam BordeBDy = 67;
+        localparam BordeBDyf = 82;
+        wire  BordeBD_on;
+        assign BordeBD_on = (BordeBDIzqx<=pixel_x) && (pixel_x<=BordeBDDerx) &&
+        (BordeBDy<=pixel_y) && (pixel_y<=BordeBDyf);
+    
+        // BOTON SUMA
+        localparam BordeBSIzqx=541;
+        localparam BordeBSDerx=556;
+        localparam BordeBSy = 52;
+        localparam BordeBSyf = 67;
+        wire  BordeBS_on;
+        assign BordeBS_on = (BordeBSIzqx<=pixel_x) && (pixel_x<=BordeBSDerx) &&
+        (BordeBSy<=pixel_y) && (pixel_y<=BordeBSyf);
+    
+        // BOTON RESTA
+        localparam BordeBRIzqx=541;
+        localparam BordeBRDerx=556;
+        localparam BordeBRy = 82;
+        localparam BordeBRyf = 97;
+        wire  BordeBR_on;
+        assign BordeBR_on = (BordeBRIzqx<=pixel_x) && (pixel_x<=BordeBRDerx) &&
+        (BordeBRy<=pixel_y) && (pixel_y<=BordeBRyf);
+    
+ // *************************************************************    
+ 
+ // ********** CAJA RING ****************************************
+    
+ assign rv1 = ((pixel_x>=486)&&(pixel_x<=501)&&(pixel_y>=352)&&(pixel_y<=447));
+ assign rv2 = ((pixel_x>=610)&&(pixel_x<=625)&&(pixel_y>=352)&&(pixel_y<=447));
+ assign rh1 = ((pixel_x>=486)&&(pixel_x<=501)&&(pixel_y>=352)&&(pixel_y<=367));
+ assign rh2 = ((pixel_x>=486)&&(pixel_x<=501)&&(pixel_y>=432)&&(pixel_y<=447));
+ assign cajitar = (tv1|tv2|th1|th2);
+
+ // ************************************************************* 	
 	
 	//Cajita para fecha
 	assign fhv1 = ((pixel_x>=160)&&(pixel_x<=175)&&(pixel_y>=32)&&(pixel_y<=127));
@@ -105,8 +157,12 @@ wire dok,tok,hok,rok,tiok,iok, puntosfh, puntost;
     assign iok= ((pixel_x>=128)&&(pixel_x<=143)&&(pixel_y>=384)&&(pixel_y<=415));
     assign puntosfh= ((((pixel_x>=256)&&(pixel_x<=271))|((pixel_x>=352)&&(pixel_x<=367)))&&((pixel_y>=64)&&(pixel_y<=95)));
     assign puntost= ((((pixel_x>=256)&&(pixel_x<=271))|((pixel_x>=352)&&(pixel_x<=367)))&&((pixel_y>=384)&&(pixel_y<=415)));
+    assign suok= ((pixel_x>=542)&&(pixel_x<=557)&&(pixel_y>=21)&&(pixel_y<=52));
+    assign reok= ((pixel_x>=542)&&(pixel_x<=557)&&(pixel_y>=99)&&(pixel_y<=130));
+    assign deok= ((pixel_x>=576)&&(pixel_x<=591)&&(pixel_y>=57)&&(pixel_y<=88));
+    assign izqok= ((pixel_x>=508)&&(pixel_x<=523)&&(pixel_y>=57)&&(pixel_y<=88)); 
     
-
+    
 //letras
 reg [4:0]char2;
 wire [3:0] row;
@@ -151,6 +207,22 @@ always @*
 	        begin
             	char2<= 5'b00110;//codigo para la i
 	        end
+	   else if (suok)
+            begin
+                char2<= 5'b01101;//codigo para la s
+            end
+       else if (reok)
+            begin
+                char2<= 5'b01100;//codigo para la r
+            end
+       else if (deok)
+            begin
+                char2<= 5'b00010;//codigo para la d
+            end
+       else if (izqok)
+            begin
+                char2<= 5'b00110;//codigo para la i
+            end
 	   else if (puntosfh)
 	        begin
 	           char2<=5'b11100;//Guiones de separación para los numeros de las horas, minutos y segundos, tanto para el reloj como para el timer
@@ -177,13 +249,31 @@ always @*
                     r<=4'h6;
                     g<=4'h0;
                     b<=4'h4;
-                end
+                end  
+          else if(BordeBD_on|BordeBI_on|BordeBS_on|BordeBR_on)
+                  begin
+                      r<=4'h6;
+                      g<=4'h0;
+                      b<=4'h4;  
+                  end
+          else if((fontb==1&&(deok|suok|reok|izqok)))
+                  begin
+                      r<=4'h0;
+                      g<=4'h0;
+                      b<=4'h1;  
+                  end                  
            else if(cajitafh|(fontb==1&&(dok|tok|puntosfh)))
                 begin
                     r<=4'h0;
                     g<=4'h0;
                     b<=4'h1;  
                 end
+           else if(cajitar)
+                begin
+                    r<=4'h1;
+                    g<=4'h0;
+                    b<=4'h0;  
+                end     
 	       else if(cajitah|(fontb==1 && (hok|rok)))
                 begin
                     r<=4'h0;
